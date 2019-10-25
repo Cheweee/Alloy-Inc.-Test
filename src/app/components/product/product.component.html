@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>Product</h1>
+<div fxLayout="column" mat-dialog-content>
+    <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput required [(ngModel)]="data.name">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>Price</mat-label>
+        <input type="number" matInput required [(ngModel)]="data.price">
+        <span matSuffix>$ &nbsp;</span>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>Count</mat-label>
+        <input type="number" matInput required [(ngModel)]="data.count">
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onCancelClick()">Cancel</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="primary">Ok</button>
+</div>
