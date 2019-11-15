@@ -54,7 +54,8 @@ export class ProductService {
     deleteFromCart(id: number): void {
         this._cart = this._cart.filter(o => o.id !== id);
         const product = this._products.find(o => o.id);
-        product.count = product.originalCount;
+        if (product)
+            product.count = product.originalCount;
     }
 
     setProductCount(id: number, count: number): Product {
