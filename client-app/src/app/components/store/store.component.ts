@@ -14,8 +14,8 @@ import { ProductComponent } from '../product/product.component';
 export class StoreComponent {
     products: MatTableDataSource<Product>;
     id?: number;
-    cartSummary: number;
     isEmpty: boolean;
+    loading: boolean = false;
     displayedColumns: string[] = ['id', 'edit', 'name', 'price', 'count', 'delete'];
 
     constructor(public dialog: MatDialog, private _service: ProductService) {
@@ -28,12 +28,12 @@ export class StoreComponent {
 
     add(): void {
         const dialogRef = this.dialog.open(ProductComponent, {
-            data: new Product()
+            data: {}
         });
 
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: Product) => {
             if (result)
-                this.createInstructor(result);
+                this.createProduct(result);
         });
     }
 
@@ -44,7 +44,7 @@ export class StoreComponent {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                this.updateInstructor(result);
+                this.updateProduct(result);
             }
             else {
                 this.getProducts();
@@ -59,7 +59,7 @@ export class StoreComponent {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                this.deleteInstructor(id);
+                this.deleteProduct(id);
             }
         })
     }
@@ -69,23 +69,23 @@ export class StoreComponent {
     }
 
     private getProducts(): void {
-        this.products.data = this._service.products;
-        this.isEmpty = !this.products.data;
-        this.cartSummary = this._service.cartSummary;
+        this.loading = true;
+        this._service.get({}).subscribe((result) => {
+            this.products.data = result;
+            this.isEmpty = !this.products.data;
+            this.loading = false;
+        });
     }
 
-    private createInstructor(product: Product): void {
-        this._service.create(product);
-        this.getProducts();
+    private createProduct(product: Product): void {
+        this._service.create(product).subscribe(null, null, () => this.getProducts());
     }
 
-    private updateInstructor(product: Product): void {
-        this._service.update(product);
-        this.getProducts();
+    private updateProduct(product: Product): void {
+        this._service.update(product).subscribe(null, null, () => this.getProducts());
     }
 
-    private deleteInstructor(id: number): void {
-        this._service.delete(id);
-        this.getProducts();
+    private deleteProduct(id: number): void {
+        this._service.delete([id]).subscribe(null, null, () => this.getProducts());
     }
 }

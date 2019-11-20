@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { Product } from '../../models/product.models';
-import { ProductService } from '../../services/product.service';
-import { CartProductComponent } from '../cart-product/cart-product.component';
+import { Product, Cart } from '../../models/product.models';
+import { ReportService } from 'src/app/services/report.service';
+import { CartService } from 'src/app/services/cart.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
     selector: 'cart',
@@ -11,53 +13,95 @@ import { CartProductComponent } from '../cart-product/cart-product.component';
     styleUrls: ['../../app.component.css']
 })
 export class CartComponent {
-    products: MatTableDataSource<Product>;
+    products: MatTableDataSource<Cart>;
+    selection: SelectionModel<Cart>;
     id?: number;
-    readonly cartSummary: number;
-    isEmpty: boolean;
-    displayedColumns: string[] = ['id', 'edit', 'name', 'price', 'count', 'summary', 'delete'];
+    cartSummary: number = 0;
+    isEmpty: boolean = true;
+    loading: boolean = true;
+    readonly displayedColumns: string[] = ['select', 'id', 'decrement', 'count', 'increment', 'name', 'price', 'summary', 'delete'];
 
-    constructor(public dialog: MatDialog, private _service: ProductService) {
+    constructor(public dialog: MatDialog, private _service: CartService, private _reportService: ReportService) {
         this.products = new MatTableDataSource<Product>();
-        this.cartSummary = _service.cartSummary;
+        this.selection = new SelectionModel<Cart>(true, []);
     }
 
     ngOnInit(): void {
         this.getProducts();
     }
 
-    edit(product: Product): void {
-        const productMaxCount = this._service.products.find(o => o.id == product.id).count;
-        const dialogRef = this.dialog.open(CartProductComponent, {
-            data: {
-                product: { ...product },
-                maxCount: productMaxCount
-            }
-        });
+    onOrderPlaced() {
+        this.getProducts();
+    }
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result)
-                this._service.setProductCountInCart(result.product.id, result.product.count);
+    isAllSelected() {
+        const numSelected = this.selection.selected.length;
+        const numRows = this.products.data.length;
+        return numSelected === numRows;
+    }
 
-            this.getProducts();
-        });
+    masterToggle() {
+        this.isAllSelected() ?
+            this.selection.clear() :
+            this.products.data.forEach(row => this.selection.select(row));
+    }
+
+    checkboxLabel(row?: Cart): string {
+        if (!row) {
+            return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+        }
+        return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    }
+
+    increment(product: Product): void {
+        product.count++;
+        this.updateCart(product);
+    }
+
+    decrement(product: Product): void {
+        product.count--;
+        this.updateCart(product);
     }
 
     delete(id: number): void {
-        this.deleteFromCart(id);
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: { message: 'Are you sure want to delete product from cart?' }
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.deleteFromCart(id);
+            }
+        });
     }
 
     filter(filterValue: string): void {
         this.products.filter = filterValue;
+        this.getProducts();
+    }
+
+    private updateCart(cart: Cart): void {
+        this._service.update(cart).subscribe(null, null, () => this.getProducts());
+    }
+
+    private getCartSummary(): void {
+        this._reportService.getCartReport({}).subscribe((result) => {
+            this.cartSummary = result.summary;
+            this.loading = false;
+        });
     }
 
     private getProducts(): void {
-        this.products.data = this._service.cart;
-        this.isEmpty = !this.products.data;
+        this.loading = true;
+        this._service.get({ ordered: false }).subscribe((result) => {
+            this.products.data = result;
+            this.selection = new SelectionModel<Cart>(true, []);
+            this.isEmpty = !this.products.data;
+        },
+            null,
+            () => this.getCartSummary());
     }
 
     private deleteFromCart(id: number) {
-        this._service.deleteFromCart(id);
-        this.getProducts();
+        this._service.delete([id]).subscribe(null, null, () => this.getProducts());
     }
 }

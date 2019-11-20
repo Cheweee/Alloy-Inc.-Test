@@ -5,6 +5,7 @@ import { Product } from 'src/app/models/product.models';
 @Component({
     selector: 'product',
     templateUrl: './product.component.html',
+    styleUrls: ['../../app.component.css'],
 })
 export class ProductComponent {
     constructor(
