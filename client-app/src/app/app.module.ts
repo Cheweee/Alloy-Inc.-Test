@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { FlexLayoutModule } from "@angular/flex-layout";
 
@@ -12,16 +12,24 @@ import { MaterialModule } from './material.module';
 import { ProductsComponent } from './components/products/products.component';
 import { StoreComponent } from './components/store/store.component';
 import { CartComponent } from './components/cart/cart.component';
-import { ProductService } from './services/product.service';
 import { ProductComponent } from './components/product/product.component';
-import { CartProductComponent } from './components/cart-product/cart-product.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { ApiUrlInterceptor } from './interceptors/url.iterceptor';
+import { DeliveryInfoComponent } from './components/delivery-info/delivery-info.component';
+import { OrderComponent } from './components/order/order.component';
+import { DeliveryComponent } from './components/delivery/delivery.component';
+import { DeliveriesComponent } from './components/deliveries/deliveries.component';
+import { OrdersComponent } from './components/orders/orders.component';
+import { OrderInfoComponent } from './components/order-info/order-info.component';
 
 // определение маршрутов
-const appRoutes: Routes =[
-  { path: '', component: ProductsComponent},
-  { path: 'products/management', component: StoreComponent},
-  { path: 'cart', component: CartComponent }
+const appRoutes: Routes = [
+  { path: '', component: ProductsComponent },
+  { path: 'products/management', component: StoreComponent },
+  { path: 'cart', component: CartComponent },
+  { path: 'deliveries', component: DeliveriesComponent },
+  { path: 'orders', component: OrdersComponent }
 ];
 
 @NgModule({
@@ -32,25 +40,33 @@ const appRoutes: Routes =[
     CartComponent,
     ProductComponent,
     ConfirmDialogComponent,
-    CartProductComponent
+    DeliveryInfoComponent,
+    OrderComponent,
+    DeliveryComponent,
+    DeliveriesComponent,
+    OrdersComponent,
+    OrderInfoComponent,
   ],
   imports: [
     FlexLayoutModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     MaterialModule,
     RouterModule.forRoot(appRoutes)
   ],
   entryComponents: [
     ProductComponent,
-    ProductsComponent,
-    StoreComponent,
-    CartComponent,
     ConfirmDialogComponent,
-    CartProductComponent
+    OrderInfoComponent,
+    DeliveryInfoComponent,
+    DeliveryComponent,
   ],
-  providers: [ProductService],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: ApiUrlInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

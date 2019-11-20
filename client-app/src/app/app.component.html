@@ -1,12 +1,18 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" class="mat-elevation-z8">
     <a matTooltip="Go to store" mat-icon-button routerLink="/products/management">
         <mat-icon aria-hidden="false">home_work</mat-icon>
+    </a>
+    <a matTooltip="Go to deliveries" mat-icon-button routerLink="/deliveries">
+        <mat-icon aria-hidden="false">local_shipping</mat-icon>
     </a>
     <a matTooltip="Go to products" mat-icon-button routerLink="">
         <mat-icon aria-hidden="false">store</mat-icon>
     </a>
     <a matTooltip="Go to cart" mat-icon-button routerLink="/cart">
         <mat-icon aria-hidden="false">shopping_cart</mat-icon>
+    </a>
+    <a matTooltip="Go to orders" mat-icon-button routerLink="/orders">
+        <mat-icon aria-hidden="false">mail</mat-icon>
     </a>
 </mat-toolbar>
 <div class="content" role="main">
