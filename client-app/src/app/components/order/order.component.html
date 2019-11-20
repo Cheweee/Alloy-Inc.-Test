@@ -1,0 +1,31 @@
+<div fxLayout="row" class="padding-y-1">
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <mat-icon color="primary">how_to_vote</mat-icon>
+        <span>Order</span>
+    </div>
+</div>
+<mat-card class="mat-elevation-z8">
+    <div fxLayout="row" fxLayoutAlign="center center" *ngIf="isEmpty">
+        <span>Order is Empty</span>
+    </div>
+    <div fxLayout="column" *ngIf="!isEmpty">
+        <mat-list>
+            <mat-list-item *ngFor="let product of products">
+                <div fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                    <span> {{product.name}} </span>
+                    <span> {{product.price * product.count}}$ </span>
+                </div>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+            <mat-list-item>
+                <div fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                    <span> Summary: </span>
+                    <h4> {{total}}$ </h4>
+                </div>
+            </mat-list-item>
+            <mat-list-item>
+                <button fxFill mat-raised-button color="primary" (click)="onBuyClick()"><span class="mat-title">Buy</span></button>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</mat-card>

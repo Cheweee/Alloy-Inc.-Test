@@ -1,0 +1,83 @@
+<h1 mat-dialog-title>Delivery info</h1>
+<mat-dialog-content>
+    <mat-horizontal-stepper linear="true" #stepper (selectionChange)="checkStep($event)">
+        <mat-step [completed]="destinationDetails.valid">
+            <form #destinationDetails="ngForm">
+                <ng-template matStepLabel>Destination details</ng-template>
+                <div fxLayout="column">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Your Name</mat-label>
+                        <input matInput required name="fullName" [(ngModel)]="data.order.fullName"
+                            (ngModelChange)="validateDestinationDetails()">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Your Address</mat-label>
+                        <input matInput required name="addres" [(ngModel)]="data.order.addres"
+                            (ngModelChange)="validateDestinationDetails()">
+                    </mat-form-field>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step [completed]="shippingDetails.valid">
+            <form #shippingDetails="ngForm">
+                <ng-template matStepLabel>Shipping details</ng-template>
+                <div fxLayout="column">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Pick delivery</mat-label>
+                        <input type="text" required aria-label="Delivery" name="delivery" matInput
+                            [matAutocomplete]="auto" [(ngModel)]="delivery" (ngModelChange)="validateShippingDetails()">
+                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
+                            <mat-option *ngFor="let delivery of data.deliveries" [value]="delivery">
+                                <div fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                                    <span> {{delivery.name}} </span>
+                                    <span> {{delivery.deliveryPrice}}$ </span>
+                                </div>
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <label class="margin-y-1">Choose a Payment Method</label>
+                    <mat-radio-group name="paymentMethod" [(ngModel)]="data.order.paymentMethod"
+                        (ngModelChange)="validateShippingDetails()">
+                        <div fxLayout="column">
+                            <mat-radio-button class="margin-y-1" [value]="0">By card</mat-radio-button>
+                            <mat-radio-button class="margin-y-1" [value]="1">Cash to courier</mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                    <mat-checkbox class="margin-y-1" name="toSpecialDate" [(ngModel)]="data.order.toSpecialDate">To
+                        special date</mat-checkbox>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Special Date</mat-label>
+                        <input matInput [matDatepicker]="picker" name="specialDate" placeholder="Choose a date"
+                            [(ngModel)]="data.order.specialDate" [disabled]="!data.order.toSpecialDate">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Summary</ng-template>
+            <section class="mat-typography">
+                <div class="margin-y-1" fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                    <span> Subtotal: </span>
+                    <span> {{data.subtotal}}$ </span>
+                </div>
+                <div class="margin-y-1" fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                    <span> Shipping: </span>
+                    <span> {{delivery ? delivery.deliveryPrice : 0}}$ </span>
+                </div>
+                <div class="margin-y-1" fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                    <span class="mat-subheading-2"> Summary: </span>
+                    <span class="mat-title">
+                        {{data.subtotal + (delivery ? delivery.deliveryPrice : 0)}}$
+                    </span>
+                </div>
+            </section>
+        </mat-step>
+    </mat-horizontal-stepper>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelClick()">Cancel</button>
+    <button mat-button (click)="stepper.next()" *ngIf="!isLastStep" [disabled]="nextDisabled">Next</button>
+    <button mat-button (click)="onSubmit()" *ngIf="isLastStep" cdkFocusInitial color="primary">Place Order</button>
+</mat-dialog-actions>

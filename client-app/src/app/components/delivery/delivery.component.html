@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>Delivery</h1>
+<mat-dialog-content fxLayout="column" >
+    <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput required [(ngModel)]="data.name">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>Price</mat-label>
+        <input type="number" matInput required [(ngModel)]="data.deliveryPrice">
+        <span matSuffix>$ &nbsp;</span>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelClick()">Cancel</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial color="primary">Ok</button>
+</mat-dialog-actions>

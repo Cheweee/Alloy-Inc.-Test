@@ -1,0 +1,49 @@
+<h1 mat-dialog-title>Delivery info</h1>
+<mat-dialog-content style="min-width: 400px;">
+    <div fxLayout="column">
+        <mat-form-field appearance="outline">
+            <mat-label>Reciepent Name</mat-label>
+            <input readonly matInput [ngModel]="data.order.fullName">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Reciepent Address</mat-label>
+            <input readonly matInput [ngModel]="data.order.addres">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Delivery</mat-label>
+            <input readonly matInput [ngModel]="deliveryName">
+        </mat-form-field>
+        <div fxLayout="row" fxLayoutAlign="space-between center" class="margin-y-1">
+            <span class="mat-subheading-2"> Payment Method: </span>
+            <span class="mat-subheading-2"> {{data.order.paymentMethod === 0 ? 'By card' : 'Cash to courier'}} </span>
+        </div>
+        <mat-form-field appearance="outline" *ngIf="data.order.toSpecialDate">
+            <mat-label>Special Date</mat-label>
+            <input readonly matInput [ngModel]="data.order.specialDate">
+        </mat-form-field>
+    </div>
+    <mat-list>
+        <mat-list-item *ngFor="let product of data.products">
+            <div fxLayout="row" fxFill fxLayoutAlign="space-between center">
+                <span> {{product.name}} </span>
+                <span> {{product.price * product.count}}$ </span>
+            </div>
+        </mat-list-item>
+    </mat-list>
+    <section class="mat-typography">
+        <div class="margin-y-1" fxLayout="row" fxFill fxLayoutAlign="space-between center">
+            <span> Subtotal: </span>
+            <span> {{subtotal}}$ </span>
+        </div>
+        <div class="margin-y-1" fxLayout="row" fxFill fxLayoutAlign="space-between center">
+            <span> Shipping: </span>
+            <span> {{deliveryPrice}}$ </span>
+        </div>
+        <div class="margin-y-1" fxLayout="row" fxFill fxLayoutAlign="space-between center">
+            <span class="mat-subheading-2"> Summary: </span>
+            <span class="mat-title">
+                {{total}}$
+            </span>
+        </div>
+    </section>
+</mat-dialog-content>
