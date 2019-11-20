@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run web api",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/TestApp.Api/bin/Debug/netcoreapp2.2/TestApp.Api.dll",
+            "args": ["api"],
+            "cwd": "${workspaceFolder}/TestApp.Api",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Run reset",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/TestApp.Api/bin/Debug/netcoreapp2.2/TestApp.Api.dll",
+            "args": ["reset"],
+            "cwd": "${workspaceFolder}/TestApp.Api",
+            "stopAtEntry": false,
+        }
+    ]
+}
