@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using TestApp.Data;
-using TestApp.Data.Enumerations;
 using TestApp.Data.Interfaces;
 using TestApp.Services;
 using TestApp.Shared;
@@ -47,12 +40,10 @@ namespace TestApp.Api
             var connectionSettingsSection = Configuration.GetSection("ConnectionSettings");
             var connectionSettings = connectionSettingsSection.Get<DatabaseConnectionSettings>();
 
-            string connectionString = connectionSettings.SqlServerServerDatabaseConnectionString;
-
             services.AddScoped(provider =>
             {
                 var logger = provider.GetService<ILogger<IDaoFactory>>();
-                return DaoFactories.GetFactory(DataProvider.SqlServer, connectionString, logger);
+                return DaoFactories.GetFactory(connectionSettings, logger);
             });
 
             services.AddScoped(provider =>
@@ -90,6 +81,13 @@ namespace TestApp.Api
                 var daoFactory = provider.GetService<IDaoFactory>();
                 var logger = provider.GetService<ILogger<ReportService>>();
                 return new ReportService(daoFactory.CartReportDao);
+            });
+
+            services.AddScoped(provider =>
+            {
+                var daoFactory = provider.GetService<IDaoFactory>();
+                var logger = provider.GetService<ILogger<UserLocationService>>();
+                return new UserLocationService(daoFactory.UserLocationDao, logger);
             });
         }
 
