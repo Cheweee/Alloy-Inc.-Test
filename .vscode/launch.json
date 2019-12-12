@@ -8,14 +8,11 @@
             "name": "Run web api",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build_api",
             "program": "${workspaceFolder}/TestApp.Api/bin/Debug/netcoreapp2.2/TestApp.Api.dll",
             "args": ["api"],
             "cwd": "${workspaceFolder}/TestApp.Api",
             "stopAtEntry": false,
-            "serverReadyAction": {
-                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
-            },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
@@ -24,10 +21,40 @@
             "name": "Run reset",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build_api",
             "program": "${workspaceFolder}/TestApp.Api/bin/Debug/netcoreapp2.2/TestApp.Api.dll",
             "args": ["reset"],
             "cwd": "${workspaceFolder}/TestApp.Api",
+            "stopAtEntry": false,
+        },
+        {
+            "name": "Run console client(get)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_console_client",
+            "program": "${workspaceFolder}/TestApp.ConsoleClientApp/bin/Debug/netcoreapp2.2/TestApp.ConsoleClientApp.dll",
+            "args": ["get"],
+            "cwd": "${workspaceFolder}/TestApp.ConsoleClientApp",
+            "stopAtEntry": false,
+        },
+        {
+            "name": "Run console client(create)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_console_client",
+            "program": "${workspaceFolder}/TestApp.ConsoleClientApp/bin/Debug/netcoreapp2.2/TestApp.ConsoleClientApp.dll",
+            "args": ["create"],
+            "cwd": "${workspaceFolder}/TestApp.ConsoleClientApp",
+            "stopAtEntry": false,
+        },
+        {
+            "name": "Run console client(delete)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_console_client",
+            "program": "${workspaceFolder}/TestApp.ConsoleClientApp/bin/Debug/netcoreapp2.2/TestApp.ConsoleClientApp.dll",
+            "args": ["delete --ids 1,2"],
+            "cwd": "${workspaceFolder}/TestApp.ConsoleClientApp",
             "stopAtEntry": false,
         }
     ]
