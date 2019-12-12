@@ -44,6 +44,8 @@ namespace TestApp.Shared
         public const string DatabaseUserNameVariableName = "database-user-name";
 
         public const string DatabasePasswordVariableName = "database-password";
+
+        public const string DatabaseProviderVariableName = "database-provider";
         #endregion
 
         public DatabaseProvider Provider { get => provider; set => provider = value; }
