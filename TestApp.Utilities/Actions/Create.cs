@@ -1,8 +1,9 @@
 using System;
-using System.Data.SqlClient;
 using TestApp.Shared;
 using CommandLine;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using System.Data;
 
 namespace TestApp.Utilities.Actions
 {
@@ -17,11 +18,9 @@ namespace TestApp.Utilities.Actions
             {
                 logger.LogInformation($"Try to create \"{settings.DatabaseName}\" database");
 
-                using (var connection = new SqlConnection(settings.SqlServerServerConnectionString))
+                using (IDbConnection connection = MigrateUtilities.CreateServerConnection(settings))
                 {
-                    var comma = new SqlCommand($@"
-                        create database {settings.DatabaseName}
-                    ", connection);
+                    var comma = MigrateUtilities.CreateCommand(settings, $@"create database {settings.DatabaseName}", connection);
 
                     connection.Open();
                     comma.ExecuteNonQuery();

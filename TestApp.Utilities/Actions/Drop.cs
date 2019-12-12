@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using TestApp.Shared;
 using CommandLine;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace TestApp.Utilities.Actions
 {
@@ -17,9 +18,9 @@ namespace TestApp.Utilities.Actions
             {
                 logger.LogInformation($"Try to drop \"{settings.DatabaseName}\" database");
 
-                using (var connection = new SqlConnection(settings.SqlServerServerConnectionString))
+                using (var connection = MigrateUtilities.CreateServerConnection(settings))
                 {
-                    var comma = new SqlCommand($"drop database if exists {settings.DatabaseName}", connection);
+                    var comma = MigrateUtilities.CreateCommand(settings, $"drop database if exists {settings.DatabaseName}", connection);
 
                     connection.Open();
                     comma.ExecuteNonQuery();
