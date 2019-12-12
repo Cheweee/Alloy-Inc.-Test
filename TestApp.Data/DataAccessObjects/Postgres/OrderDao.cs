@@ -7,7 +7,7 @@ using TestApp.Data.Models;
 using Microsoft.Extensions.Logging;
 using TestApp.Shared.Enumerations;
 
-namespace TestApp.Data.DataAccessObjects.SqlServer
+namespace TestApp.Data.DataAccessObjects.Postgres
 {
     public class OrderDao : BaseDao, IOrderDao
     {
@@ -18,13 +18,13 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql create order query");
-                model.Id = await QuerySingleOrDefaultAsync<int>(@"
-                        insert into [Order] (
-                            DeliveryId,
-                            FullName,
-                            Addres,
-                            SpecialDate,
-                            PaymentMethod
+                model.Id = await QuerySingleOrDefaultAsync<int>($@"
+                        insert into {"\"Order\""} (
+                           {"\"DeliveryId\""},
+                           {"\"FullName\""},
+                           {"\"Addres\""},
+                           {"\"SpecialDate\""},
+                           {"\"PaymentMethod\""}
                         ) values (
                             @DeliveryId,
                             @FullName,
@@ -32,7 +32,7 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
                             @SpecialDate,
                             @PaymentMethod
                         );
-                        select SCOPE_IDENTITY();
+                        returning{"\"Id\""};
                 ", model);
                 _logger.LogInformation("Sql create order query successfully executed");
             }
@@ -48,9 +48,9 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql delete orders query");
-                await ExecuteAsync(@"
-                    delete from [Order]
-                    where Id in @ids
+                await ExecuteAsync($@"
+                    delete from {"\"Order\""}
+                    where{"\"Id\""} in @ids
                 ", new { ids });
                 _logger.LogInformation("Sql delete orders query successfully executed");
             }
@@ -69,30 +69,30 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
 
                 _logger.LogInformation("Try to create get orders sql query");
 
-                sql.AppendLine(@"
+                sql.AppendLine($@"
                     select 
-                        Id,
-                        DeliveryId,
-                        FullName,
-                        Addres,
-                        SpecialDate,
-                        PaymentMethod
-                    from [Order]
+                       {"\"Id\""},
+                       {"\"DeliveryId\""},
+                       {"\"FullName\""},
+                       {"\"Addres\""},
+                       {"\"SpecialDate\""},
+                       {"\"PaymentMethod\""}
+                    from {"\"Order\""}
                 ");
 
                 int conditionIndex = 0;
                 if (options.Id.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id = @id)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = @id)");
                 }
                 if (options.Ids != null)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id in @ids)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = any(@ids))");
                 }
                 if (!string.IsNullOrEmpty(options.NormalizedSearch))
                 {
                     sql.AppendLine($@"
-                        {(conditionIndex++ == 0 ? "where" : "and")} (lower(Name) like lower(@NormalizedSearch))
+                        {(conditionIndex++ == 0 ? "where" : "and")} (lower({"\"FullName\""}) like lower(@NormalizedSearch))
                     ");
                 }
                 _logger.LogInformation($"Sql query successfully created:\n{sql.ToString()}");
@@ -114,14 +114,14 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql update order query");
-                await ExecuteAsync(@"
-                    update [Order] set
-                        DeliveryId = @DeliveryId,
-                        FullName = @FullName,
-                        Addres = @Addres,
-                        SpecialDate = @SpecialDate,
-                        PaymentMethod = @PaymentMethod
-                    where Id = @Id
+                await ExecuteAsync($@"
+                    update {"\"Order\""} set
+                       {"\"DeliveryId\""} = @DeliveryId,
+                       {"\"FullName\""} = @FullName,
+                       {"\"Addres\""} = @Addres,
+                       {"\"SpecialDate\""} = @SpecialDate,
+                       {"\"PaymentMethod\""} = @PaymentMethod
+                    where{"\"Id\""} = @Id
                 ", model);
                 _logger.LogInformation("Sql update order query successfully executed");
             }

@@ -7,7 +7,7 @@ using TestApp.Data.Models;
 using Microsoft.Extensions.Logging;
 using TestApp.Shared.Enumerations;
 
-namespace TestApp.Data.DataAccessObjects.SqlServer
+namespace TestApp.Data.DataAccessObjects.Postgres
 {
     public class DeliveryDao : BaseDao, IDeliveryDao
     {
@@ -18,15 +18,15 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql create delivery query");
-                model.Id = await QuerySingleOrDefaultAsync<int>(@"
-                        insert into Delivery (
-                            DeliveryPrice,
-                            Name
+                model.Id = await QuerySingleOrDefaultAsync<int>($@"
+                        insert into {"\"Delivery\""} (
+                           {"\"DeliveryPrice\""},
+                           {"\"Name\""}
                         ) values (
                             @DeliveryPrice,
                             @Name
                         );
-                        select SCOPE_IDENTITY();
+                        returning {"\"Id\""};
                 ", model);
                 _logger.LogInformation("Sql create delivery query successfully executed");
             }
@@ -42,9 +42,9 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql delete deliverys query");
-                await ExecuteAsync(@"
-                    delete from Delivery
-                    where Id in @ids
+                await ExecuteAsync($@"
+                    delete from {"\"Delivery\""}
+                    where {"\"Id\""} = any(@ids)
                 ", new { ids });
                 _logger.LogInformation("Sql delete deliverys query successfully executed");
             }
@@ -63,32 +63,34 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
 
                 _logger.LogInformation("Try to create get deliverys sql query");
 
-                sql.AppendLine(@"
+                sql.AppendLine($@"
                     select 
-                        Id, DeliveryPrice, Name
-                    from Delivery
+                        {"\"Id\""},
+                        {"\"DeliveryPrice\""},
+                        {"\"Name\""}
+                    from {"\"Delivery\""}
                 ");
 
                 int conditionIndex = 0;
                 if (options.Id.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id = @Id)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = @Id)");
                 }
                 if (options.Ids != null)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id in @Ids)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = any(@Ids))");
                 }
                 if (options.ExcludeIds != null)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id not in @ExcludeIds)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} <> any(@ExcludeIds))");
                 }
                 if (!string.IsNullOrEmpty(options.NormalizedSearch))
                 {
-                    sql.AppendLine($@"{(conditionIndex++ == 0 ? "where" : "and")} (lower(Name) like lower(@NormalizedSearch))");
+                    sql.AppendLine($@"{(conditionIndex++ == 0 ? "where" : "and")} (lower({"\"Name\""}) like lower(@NormalizedSearch))");
                 }
                 if (!string.IsNullOrEmpty(options.Name))
                 {
-                    sql.AppendLine($@"{(conditionIndex++ == 0 ? "where" : "and")} (Name = @Name)");
+                    sql.AppendLine($@"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Name\""} = @Name)");
                 }
                 _logger.LogInformation($"Sql query successfully created:\n{sql.ToString()}");
 
@@ -109,11 +111,11 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql update delivery query");
-                await ExecuteAsync(@"
-                    update Delivery set
-                        DeliveryPrice = @DeliveryPrice,
-                        Name = @Name
-                    where Id = @Id
+                await ExecuteAsync($@"
+                    update {"\"Delivery\""} set
+                       {"\"DeliveryPrice\""} = @DeliveryPrice,
+                       {"\"Name\""} = @Name
+                    where {"\"Id\""} = @Id
                 ", model);
                 _logger.LogInformation("Sql update delivery query successfully executed");
             }

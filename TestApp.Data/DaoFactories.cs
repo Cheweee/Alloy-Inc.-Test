@@ -1,19 +1,22 @@
 using TestApp.Data.Interfaces;
-using TestApp.Data.Enumerations;
+using TestApp.Shared;
 using Microsoft.Extensions.Logging;
+using TestApp.Shared.Enumerations;
 
 namespace TestApp.Data
 {
     public class DaoFactories
     {
-        public static IDaoFactory GetFactory(DataProvider provider, string connectionString, ILogger logger)
+        public static IDaoFactory GetFactory(DatabaseConnectionSettings settings, ILogger logger)
         {
-            switch (provider)
+            switch (settings.Provider)
             {
-                case DataProvider.SqlServer:
-                    return new DataAccessObjects.SqlServer.DaoFactory(connectionString, logger);
+                case DatabaseProvider.SqlServer:
+                    return new DataAccessObjects.SqlServer.DaoFactory(settings.SqlServerServerDatabaseConnectionString, logger);
+                case DatabaseProvider.Postgres:
+                    return new DataAccessObjects.Postgres.DaoFactory(settings.PostgresDatabaseConnectionString, logger);
                 default:
-                    return new DataAccessObjects.SqlServer.DaoFactory(connectionString, logger);
+                    return new DataAccessObjects.SqlServer.DaoFactory(settings.SqlServerServerDatabaseConnectionString, logger);
             }
         }
     }

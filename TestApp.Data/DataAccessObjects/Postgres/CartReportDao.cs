@@ -6,7 +6,7 @@ using TestApp.Shared.Enumerations;
 using TestApp.Data.Interfaces;
 using TestApp.Data.Models;
 
-namespace TestApp.Data.DataAccessObjects.SqlServer
+namespace TestApp.Data.DataAccessObjects.Postgres
 {
     public class CartReportDao : BaseDao, ICartReportDao
     {
@@ -20,20 +20,20 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
 
                 _logger.LogInformation("Try to create get cart report sql query");
 
-                sql.AppendLine(@"
+                sql.AppendLine($@"
                     select 
-                    	coalesce(sum(Price * Count), 0) as Summary
-                    from Cart
+                    	coalesce(sum({"\"Price\""} * {"\"Count\""}), 0) as Summary
+                    from {"\"Cart\""}
                     where OrderId is null
                 ");
 
                 if (options.DateFrom.HasValue)
                 {
-                    sql.AppendLine($"and (DateCreated >= @DateFrom)");
+                    sql.AppendLine($"and ({"\"DateCreated\""} >= @DateFrom)");
                 }
                 if (options.DateTo.HasValue)
                 {
-                    sql.AppendLine($"and (DateCreated <= @DateTo)");
+                    sql.AppendLine($"and ({"\"DateCreated\""} <= @DateTo)");
                 }
                 _logger.LogInformation($"Sql query successfully created:\n{sql.ToString()}");
 

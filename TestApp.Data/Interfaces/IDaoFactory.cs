@@ -7,5 +7,6 @@ namespace TestApp.Data.Interfaces
         IDeliveryDao DeliveryDao { get; }
         IOrderDao OrderDao { get; }
         IProductDao ProductDao { get; }
+        IUserLocationDao UserLocationDao { get; }
     }
 }

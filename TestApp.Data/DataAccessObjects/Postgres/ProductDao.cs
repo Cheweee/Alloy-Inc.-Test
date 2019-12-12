@@ -7,7 +7,7 @@ using TestApp.Data.Models;
 using Microsoft.Extensions.Logging;
 using TestApp.Shared.Enumerations;
 
-namespace TestApp.Data.DataAccessObjects.SqlServer
+namespace TestApp.Data.DataAccessObjects.Postgres
 {
     public class ProductDao : BaseDao, IProductDao
     {
@@ -18,11 +18,11 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql create product query");
-                model.Id = await QuerySingleOrDefaultAsync<int>(@"
-                        insert into Product (
-                            Count,
-                            Price,
-                            Name
+                model.Id = await QuerySingleOrDefaultAsync<int>($@"
+                        insert into{"\"Product\""} (
+                           {"\"Count\""},
+                           {"\"Price\""},
+                           {"\"Name\""}
                         ) values (
                             @Count,
                             @Price,
@@ -44,9 +44,9 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql delete products query");
-                await ExecuteAsync(@"
-                    delete from Product
-                    where Id in @ids
+                await ExecuteAsync($@"
+                    delete from{"\"Product\""}
+                    where{"\"Id\""} = any(@ids)
                 ", new { ids });
                 _logger.LogInformation("Sql delete products query successfully executed");
             }
@@ -65,33 +65,33 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
 
                 _logger.LogInformation("Try to create get products sql query");
 
-                sql.AppendLine(@"
+                sql.AppendLine($@"
                     select 
-                        Id,
-                        Count,
-                        Price,
-                        Name
-                    from Product
+                       {"\"Id\""},
+                       {"\"Count\""},
+                       {"\"Price\""},
+                       {"\"Name\""}
+                    from{"\"Product\""}
                 ");
 
                 int conditionIndex = 0;
                 if (options.Id.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id = @id)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = @id)");
                 }
                 if (options.Ids != null)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id in @ids)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = any(@ids))");
                 }
                 if (!string.IsNullOrEmpty(options.NormalizedSearch))
                 {
                     sql.AppendLine($@"
-                        {(conditionIndex++ == 0 ? "where" : "and")} (lower(Name) like lower(@NormalizedSearch))
+                        {(conditionIndex++ == 0 ? "where" : "and")} (lower({"\"Name\""}) like lower(@NormalizedSearch))
                     ");
                 }
                 if(!string.IsNullOrEmpty(options.Name))
                 {
-                    sql.AppendLine($@"{(conditionIndex++ == 0 ? "where" : "and")} (Name = @Name)");
+                    sql.AppendLine($@"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Name\""} = @Name)");
                 }
                 _logger.LogInformation($"Sql query successfully created:\n{sql.ToString()}");
 
@@ -112,12 +112,12 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql update product query");
-                await ExecuteAsync(@"
-                    update Product set
-                        Count = @Count,
-                        Price = @Price,
-                        Name = @Name
-                    where Id = @Id
+                await ExecuteAsync($@"
+                    update{"\"Product\""} set
+                       {"\"Count\""} = @Count,
+                       {"\"Price\""} = @Price,
+                       {"\"Name\""} = @Name
+                    where{"\"Id\""} = @Id
                 ", model);
                 _logger.LogInformation("Sql update product query successfully executed");
             }

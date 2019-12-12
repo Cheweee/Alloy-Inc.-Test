@@ -7,7 +7,7 @@ using TestApp.Data.Models;
 using Microsoft.Extensions.Logging;
 using TestApp.Shared.Enumerations;
 
-namespace TestApp.Data.DataAccessObjects.SqlServer
+namespace TestApp.Data.DataAccessObjects.Postgres
 {
     public class CartDao : BaseDao, ICartDao
     {
@@ -18,13 +18,13 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql create cart query");
-                await ExecuteAsync(@"
-                        insert into Cart (
-                            Count,
-                            Price,
-                            OrderId,
-                            ProductId,
-                            Name
+                await ExecuteAsync($@"
+                        insert into {"\"Cart\""} (
+                            {"\"Count\""},
+                            {"\"Price\""},
+                            {"\"OrderId\""},
+                            {"\"ProductId\""},
+                            {"\"Name\""}
                         ) values (
                             @Count,
                             @Price,
@@ -47,9 +47,9 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql delete carts query");
-                await ExecuteAsync(@"
-                    delete from Cart
-                    where Id in @ids
+                await ExecuteAsync($@"
+                    delete from {"\"Cart\""}
+                    where {"\"Id\""} = any(@ids)
                 ", new { ids });
                 _logger.LogInformation("Sql delete carts query successfully executed");
             }
@@ -68,49 +68,49 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
 
                 _logger.LogInformation("Try to create get carts sql query");
 
-                sql.AppendLine(@"
+                sql.AppendLine($@"
                     select 
-                        Id,
-                        OrderId,
-                        ProductId,
-                        Count,
-                        Price,
-                        Name
-                    from Cart
+                        {"\"Id\""},
+                        {"\"OrderId\""},
+                        {"\"ProductId\""},
+                        {"\"Count\""},
+                        {"\"Price\""},
+                        {"\"Name\""}
+                    from {"\"Cart\""}
                 ");
 
                 int conditionIndex = 0;
                 if (options.Id.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id = @id)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = @id)");
                 }
                 if (options.ProductId.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (ProductId = @ProductId)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"ProductId\""} = @ProductId)");
                 }
                 if (options.OrderId.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (OrderId = @OrderId)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"OrderId\""} = @OrderId)");
                 }
                 if (options.Ordered.HasValue)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (OrderId is {(options.Ordered.Value ? "not" : string.Empty)} null)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"OrderId\""} is {(options.Ordered.Value ? "not" : string.Empty)} null)");
                 }
                 if (options.Ids != null)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Id in @ids)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Id\""} = any(@ids))");
                 }
                 if(options.OrderIds != null)
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (OrderId in @OrderIds)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"OrderId\""} = any(@OrderIds))");
                 }
                 if (!string.IsNullOrEmpty(options.NormalizedSearch))
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (lower(Name) like lower(@NormalizedSearch))");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (lower({"\"Name\""}) like lower(@NormalizedSearch))");
                 }
                 if (!string.IsNullOrEmpty(options.Name))
                 {
-                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} (Name = @Name)");
+                    sql.AppendLine($"{(conditionIndex++ == 0 ? "where" : "and")} ({"\"Name\""} = @Name)");
                 }
                 _logger.LogInformation($"Sql query successfully created:\n{sql.ToString()}");
 
@@ -131,14 +131,14 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             try
             {
                 _logger.LogInformation("Trying to execute sql update cart query");
-                await ExecuteAsync(@"
-                    update Cart set
-                        ProductId = @ProductId,
-                        OrderId = @OrderId,
-                        Count = @Count,
-                        Price = @Price,
-                        Name = @Name
-                    where Id = @Id
+                await ExecuteAsync($@"
+                    update {"\"Cart\""} set
+                        {"\"ProductId\""} = @ProductId,
+                        {"\"OrderId\""} = @OrderId,
+                        {"\"Count\""} = @Count,
+                        {"\"Price\""} = @Price,
+                        {"\"Name\""} = @Name
+                    where {"\"Id\""} = @Id
                 ", model);
                 _logger.LogInformation("Sql update cart query successfully executed");
             }

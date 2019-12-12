@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using TestApp.Data.DataAccessObjects.SqlServer;
+using TestApp.Shared.Enumerations;
 using TestApp.Data.Interfaces;
 
 namespace TestApp.Data.DataAccessObjects.SqlServer
@@ -15,14 +16,16 @@ namespace TestApp.Data.DataAccessObjects.SqlServer
             _logger = logger;
         }
 
-        public ICartDao CartDao => new CartDao(_connectionString, _logger);
+        public ICartDao CartDao => new CartDao(_connectionString, _logger, DatabaseProvider.SqlServer);
 
-        public ICartReportDao CartReportDao => new CartReportDao(_connectionString, _logger);
+        public ICartReportDao CartReportDao => new CartReportDao(_connectionString, _logger, DatabaseProvider.SqlServer);
         
-        public IDeliveryDao DeliveryDao => new DeliveryDao(_connectionString, _logger);
+        public IDeliveryDao DeliveryDao => new DeliveryDao(_connectionString, _logger, DatabaseProvider.SqlServer);
 
-        public IOrderDao OrderDao => new OrderDao(_connectionString, _logger);
+        public IOrderDao OrderDao => new OrderDao(_connectionString, _logger, DatabaseProvider.SqlServer);
 
-        public IProductDao ProductDao => new ProductDao(_connectionString, _logger);
+        public IProductDao ProductDao => new ProductDao(_connectionString, _logger, DatabaseProvider.SqlServer);
+
+        public IUserLocationDao UserLocationDao => new UserLocationDao(_connectionString, _logger, DatabaseProvider.SqlServer);
     }
 }
